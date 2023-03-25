@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Detection</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            margin-bottom: 1rem;
+        }
+
+        #video {
+            margin-bottom: -2rem;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.7.4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+    <script defer src="app-objectdetection.js"></script>
+</head>
+
+<body>
+    <header class="bg-success text-white text-center py-4">
+        <h1>Object Detection Demo</h1>
+    </header>
+    <div>
+        <video id="video" width="720" height="560" autoplay muted></video>
+    </div>
+    <div>
+        <h3>Detected objects:</h3>
+        <pre id="detected-objects"></pre>
+    </div>
+
+</body>
+
+</html>

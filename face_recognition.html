@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            margin-bottom: 1rem;
+        }
+
+        #video {
+            margin-bottom: -2rem;
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script defer src="app-facerecog.js"></script>
+</head>
+
+<body>
+    <header class="bg-success text-white text-center py-4">
+        <h1>Face Recognition Demo</h1>
+    </header>
+    <div>
+        <video id="video" width="720" height="560" autoplay muted></video>
+    </div>
+    <div class="mb-3">
+        <label for="reference-image-url">Reference image URL:</label>
+        <input type="text" id="reference-image-url" name="reference-image-url">
+        <button id="set-reference-image">Set reference image</button>
+    </div>
+    <div>
+        <h3>Threshold: <span id="threshold"></span></h3>
+    </div>
+    <div>
+        <h3>Best match: <span id="best-match"></span></h3>
+    </div>
+    <div>
+        <h3>Similarity: <span id="similarity-percentage"></span></h3>
+    </div>
+</body>
+
+</html>

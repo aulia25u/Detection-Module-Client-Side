@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proctoring Modul Client Side Demo</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 90%;
+        }
+
+        main {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="bg-success text-white text-center py-4">
+        <h1>Proctoring Modul Client Side Demo</h1>
+    </header>
+    <div class="wrapper">
+        <main class="container mt-5">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card d-flex flex-column">
+                        <div class="card-body flex-grow-1">
+                            <h3 class="card-title">Face Detection</h3>
+                            <p class="card-text">
+                                Face Detection is an AI-powered service that can detect human faces in images or videos.
+                                This site uses MediaPipe's Face Detection JavaScript library to provide real-time face
+                                detection capabilities.
+                            </p>
+                        </div>
+                        <a href="face_detection.html" target="_blank" class="btn btn-success">Visit Face Detection</a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card d-flex flex-column">
+                        <div class="card-body flex-grow-1">
+                            <h3 class="card-title">Face Recognition</h3>
+                            <p class="card-text">
+                                Face Recognition is an AI service that identifies individuals by analyzing their facial
+                                features.
+                                This site uses MediaPipe's Face Mesh JavaScript library to extract facial landmarks and
+                                perform recognition.
+                            </p>
+                        </div>
+                        <a href="face_recognition.html" target="_blank" class="btn btn-success">Visit Face
+                            Recognition</a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card d-flex flex-column">
+                        <div class="card-body flex-grow-1">
+                            <h3 class="card-title">Object Detection</h3>
+                            <p class="card-text">
+                                Object Detection is an AI service that can identify and locate objects within images or
+                                videos.
+                                This site utilizes TensorFlow.js and the COCO-SSD model to deliver accurate object
+                                detection
+                                capabilities.
+                            </p>
+                        </div>
+                        <a href="object_detection.html" target="_blank" class="btn btn-success">Visit Object
+                            Detection</a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card d-flex flex-column">
+                        <div class="card-body flex-grow-">
+                            <h3 class="card-title">All In One</h3>
+                            <p class="card-text">
+                                This site uses all the services to detect faces, recognition face and objects in a
+                                video.
+                        </div>
+                        <a href="all_service.html" target="_blank" class="btn btn-success">Visit Object
+                            Detection</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="bg-success text-white text-center py-2">
+            <h2>Credits (*/ω＼*)❤</h2>
+        </footer>
+    </div>
+</body>
+
+</html>

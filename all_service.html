@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Detection, Recognition and Object Detection</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            margin-bottom: 1rem;
+        }
+
+        #video {
+            display: block;
+            margin: 0 auto;
+            margin-bottom: 1rem;
+        }
+
+        .centered-container {
+            width: 80%;
+            margin: 0 auto;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.7.4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+    <script src="app.js" defer></script>
+</head>
+
+<body>
+    <header class="bg-success text-white text-center py-4">
+        <h1>Face Detection, Recognition and Object Detection</h1>
+    </header>
+
+    <div class="container mx-auto centered-container">
+        <div>
+            <video id="video" width="720" height="560" autoplay muted></video>
+        </div>
+        <div class="mb-3">
+            <label for="reference-image-url">Reference image URL:</label>
+            <input type="text" id="reference-image-url" name="reference-image-url">
+            <button id="set-reference-image">Set reference image</button>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h3>Threshold: <span id="threshold"></span></h3>
+                <h3>Face count: <span id="face-count"></span></h3>
+                <h3>Best match: <span id="best-match"></span></h3>
+                <h3>Similarity: <span id="similarity-percentage"></span></h3>
+            </div>
+            <div class="col">
+                <h3>Detected objects:</h3>
+                <pre id="detected-objects"></pre>
+            </div>
+        </div>
+        <h3>Landmarks:</h3>
+        <pre id="face-landmarks"></pre>
+    </div>
+</body>
+
+</html>
