@@ -32,3 +32,5 @@ Detection Process Client Side Using Mediapipe JS, Tensorflow JS, FaceAPI JS
 * Include Face Recognition
 * Include Object Detection
 
+* Resource & Code Optimize
+<img width="622" alt="Screenshot Index" src="https://github.com/aulia25u/Detection-Module-Client-Side/blob/main/AIO-Resource-Optimize.png">
