@@ -10,7 +10,7 @@ async function loadModels() {
 }
 
 async function getReferenceImage(url) {
-  const corsProxy = "https://api.allorigins.win/raw?url=";
+  const corsProxy = "https://cors-anywhere.herokuapp.com/";
 
   const img = await faceapi.fetchImage(corsProxy + url);
   const detections = await faceapi
