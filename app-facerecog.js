@@ -12,7 +12,9 @@ async function loadModels() {
 
 // Get reference image for face recognition
 async function getReferenceImage(url) {
-  const corsProxy = "https://cors-anywhere.herokuapp.com/";
+  //const corsProxy = "https://cors-anywhere.herokuapp.com/";
+  const corsProxy = "https://cors.bridged.cc/";
+
   const img = await faceapi.fetchImage(corsProxy + url);
   const detections = await faceapi
     .detectSingleFace(img)
