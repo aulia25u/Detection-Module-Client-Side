@@ -30,8 +30,7 @@ async function startVideo() {
               video,
               new faceapi.SsdMobilenetv1Options({ minConfidence })
             )
-            .withFaceLandmarks()
-            .withFaceExpressions();
+            .withFaceLandmarks();
 
           // Resize video input
           const inputSize = 224;

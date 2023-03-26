@@ -10,7 +10,8 @@ async function loadModels() {
 }
 
 async function getReferenceImage(url) {
-  const corsProxy = "https://cors-anywhere.herokuapp.com/";
+  const corsProxy = "https://api.allorigins.win/raw?url=";
+
   const img = await faceapi.fetchImage(corsProxy + url);
   const detections = await faceapi
     .detectSingleFace(img)
@@ -27,6 +28,10 @@ async function processVideoFrames() {
   thresholdElement.textContent = threshold + " / " + threshold * 100 + "%";
 
   const objectModel = await cocoSsd.load();
+
+  const detectionInterval = 200; // Adjust this value to control detection frequency (in milliseconds)
+  const minConfidence = 0.5; // Adjust this value to control detection accuracy (0 to 1)
+
   const stream = await navigator.mediaDevices.getUserMedia({
     video: true,
     audio: false,
@@ -43,7 +48,10 @@ async function processVideoFrames() {
       const faceLandmarksElement = document.getElementById("face-landmarks");
 
       const detections = await faceapi
-        .detectAllFaces(video)
+        .detectAllFaces(
+          video,
+          new faceapi.SsdMobilenetv1Options({ minConfidence })
+        )
         .withFaceLandmarks()
         .withFaceDescriptors();
 
@@ -62,13 +70,31 @@ async function processVideoFrames() {
         similarityPercentageElement.textContent = `${similarityPercentage.toFixed(
           2
         )}%`;
+
+        // Resize video input
+        const inputSize = 224;
+        const resizedResults = faceapi.resizeResults(detections, {
+          width: inputSize,
+          height: inputSize,
+        });
+
         faceCountElement.textContent = detections.length;
 
         let landmarksText = "";
-        detections.forEach((detection, index) => {
+        resizedResults.forEach((detection, index) => {
           landmarksText += `Face ${index + 1} coordinates: ${JSON.stringify(
             detection.landmarks.positions
           )}\n`;
+
+          // Eye coordinates
+          const leftEye = detection.landmarks.getLeftEye();
+          const rightEye = detection.landmarks.getRightEye();
+          landmarksText += `Face ${
+            index + 1
+          } left eye coordinates: ${JSON.stringify(leftEye)}\n`;
+          landmarksText += `Face ${
+            index + 1
+          } right eye coordinates: ${JSON.stringify(rightEye)}\n`;
         });
         faceLandmarksElement.textContent = landmarksText;
       }
@@ -84,7 +110,7 @@ async function processVideoFrames() {
         detectedObjectsElement.appendChild(p);
       });
 
-      requestAnimationFrame(onResults);
+      setTimeout(onResults, detectionInterval);
     }
 
     onResults();
