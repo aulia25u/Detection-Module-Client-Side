@@ -46,6 +46,32 @@ function mapLandmarkCoordinates(landmarks) {
   return mappedLandmarks;
 }
 
+function createTable(mappedLandmarks) {
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const tbody = document.createElement("tbody");
+
+  const headerRow = document.createElement("tr");
+  for (const landmarkName of Object.keys(mappedLandmarks)) {
+    const th = document.createElement("th");
+    th.textContent = landmarkName;
+    headerRow.appendChild(th);
+  }
+  thead.appendChild(headerRow);
+
+  const bodyRow = document.createElement("tr");
+  for (const coordinates of Object.values(mappedLandmarks)) {
+    const td = document.createElement("td");
+    td.textContent = JSON.stringify(coordinates, null, 2);
+    bodyRow.appendChild(td);
+  }
+  tbody.appendChild(bodyRow);
+
+  table.appendChild(thead);
+  table.appendChild(tbody);
+  return table;
+}
+
 // Start webcam and process frames
 async function startVideo() {
   await loadModels();
@@ -76,23 +102,19 @@ async function startVideo() {
 
           faceCountElement.textContent = resizedResults.length;
 
-          let landmarksText = "";
+          faceLandmarksElement.innerHTML = ""; // Clear previous data
           resizedResults.forEach((detection, index) => {
             const mappedLandmarks = mapLandmarkCoordinates(
               detection.landmarks.positions
             );
 
-            landmarksText += `Face ${index + 1} coordinates:\n`;
-            for (const [landmarkName, coordinates] of Object.entries(
-              mappedLandmarks
-            )) {
-              landmarksText += `${landmarkName}: ${JSON.stringify(
-                coordinates
-              )}\n`;
-            }
-            landmarksText += "\n";
+            const table = createTable(mappedLandmarks);
+            const faceTitle = document.createElement("p");
+            faceTitle.textContent = `Face ${index + 1} coordinates:`;
+
+            faceLandmarksElement.appendChild(faceTitle);
+            faceLandmarksElement.appendChild(table);
           });
-          faceLandmarksElement.textContent = landmarksText;
 
           await new Promise((resolve) =>
             setTimeout(resolve, detectionInterval)
