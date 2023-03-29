@@ -82,19 +82,15 @@ async function startVideo() {
               detection.landmarks.positions
             );
 
-            landmarksText += `Face ${index + 1} coordinates: ${JSON.stringify(
+            landmarksText += `Face ${index + 1} coordinates:\n`;
+            for (const [landmarkName, coordinates] of Object.entries(
               mappedLandmarks
-            )}\n`;
-
-            // Eye coordinates
-            const leftEye = mappedLandmarks.leftEye;
-            const rightEye = mappedLandmarks.rightEye;
-            landmarksText += `Face ${
-              index + 1
-            } left eye coordinates: ${JSON.stringify(leftEye)}\n`;
-            landmarksText += `Face ${
-              index + 1
-            } right eye coordinates: ${JSON.stringify(rightEye)}\n`;
+            )) {
+              landmarksText += `${landmarkName}: ${JSON.stringify(
+                coordinates
+              )}\n`;
+            }
+            landmarksText += "\n";
           });
           faceLandmarksElement.textContent = landmarksText;
 
