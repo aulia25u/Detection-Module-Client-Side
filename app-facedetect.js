@@ -11,6 +11,41 @@ async function loadModels() {
   await faceapi.nets.faceExpressionNet.loadFromUri(modelPath);
 }
 
+function mapLandmarkCoordinates(landmarks) {
+  const mappedLandmarks = {};
+
+  // Face landmark names
+  const landmarkNames = [
+    "jawline",
+    "leftEyebrow",
+    "rightEyebrow",
+    "nose",
+    "leftEye",
+    "rightEye",
+    "outerLip",
+    "innerLip",
+  ];
+
+  // Starting and ending indices for each landmark
+  const landmarkIndices = [
+    [0, 16],
+    [17, 21],
+    [22, 26],
+    [27, 35],
+    [36, 41],
+    [42, 47],
+    [48, 59],
+    [60, 67],
+  ];
+
+  landmarkNames.forEach((landmarkName, index) => {
+    const [start, end] = landmarkIndices[index];
+    mappedLandmarks[landmarkName] = landmarks.slice(start, end + 1);
+  });
+
+  return mappedLandmarks;
+}
+
 // Start webcam and process frames
 async function startVideo() {
   await loadModels();
@@ -43,13 +78,17 @@ async function startVideo() {
 
           let landmarksText = "";
           resizedResults.forEach((detection, index) => {
-            landmarksText += `Face ${index + 1} coordinates: ${JSON.stringify(
+            const mappedLandmarks = mapLandmarkCoordinates(
               detection.landmarks.positions
+            );
+
+            landmarksText += `Face ${index + 1} coordinates: ${JSON.stringify(
+              mappedLandmarks
             )}\n`;
 
             // Eye coordinates
-            const leftEye = detection.landmarks.getLeftEye();
-            const rightEye = detection.landmarks.getRightEye();
+            const leftEye = mappedLandmarks.leftEye;
+            const rightEye = mappedLandmarks.rightEye;
             landmarksText += `Face ${
               index + 1
             } left eye coordinates: ${JSON.stringify(leftEye)}\n`;
