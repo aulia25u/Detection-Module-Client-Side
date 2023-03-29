@@ -59,14 +59,26 @@ function createTable(mappedLandmarks) {
   }
   thead.appendChild(headerRow);
 
-  const bodyRow = document.createElement("tr");
-  for (const coordinates of Object.values(mappedLandmarks)) {
-    const td = document.createElement("td");
-    td.textContent = JSON.stringify(coordinates, null, 2);
-    bodyRow.appendChild(td);
-  }
-  tbody.appendChild(bodyRow);
+  // Create separate rows for x and y coordinates
+  const xRow = document.createElement("tr");
+  const yRow = document.createElement("tr");
 
+  for (const coordinates of Object.values(mappedLandmarks)) {
+    const tdX = document.createElement("td");
+    const tdY = document.createElement("td");
+
+    const xCoordinates = coordinates.map((coord) => coord._x);
+    const yCoordinates = coordinates.map((coord) => coord._y);
+
+    tdX.textContent = `X: ${JSON.stringify(xCoordinates, null, 2)}`;
+    tdY.textContent = `Y: ${JSON.stringify(yCoordinates, null, 2)}`;
+
+    xRow.appendChild(tdX);
+    yRow.appendChild(tdY);
+  }
+
+  tbody.appendChild(xRow);
+  tbody.appendChild(yRow);
   table.appendChild(thead);
   table.appendChild(tbody);
   return table;
