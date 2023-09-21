@@ -32,22 +32,24 @@ function mapLandmarkCoordinates(landmarks) {
   return mappedLandmarks;
 }
 
-function drawEyePosition(mappedLandmarks) {
-  overlayContext.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-
-  // Calculate and draw the center for each eye
-  ["leftEye", "rightEye"].forEach((eye) => {
-    const eyePositions = mappedLandmarks[eye];
-    const x = eyePositions.reduce((sum, pos) => sum + pos._x, 0) / eyePositions.length;
-    const y = eyePositions.reduce((sum, pos) => sum + pos._y, 0) / eyePositions.length;
-
-    overlayContext.beginPath();
-    overlayContext.arc(x, y, 5, 0, 2 * Math.PI);
-    overlayContext.fillStyle = "red";
-    overlayContext.fill();
-    overlayContext.closePath();
-  });
-}
+function drawEyePosition(video, mappedLandmarks) {
+    // First, draw the video frame
+    overlayContext.drawImage(video, 0, 0, overlayCanvas.width, overlayCanvas.height);
+  
+    // Calculate and draw the center for each eye
+    ["leftEye", "rightEye"].forEach((eye) => {
+      const eyePositions = mappedLandmarks[eye];
+      const x = eyePositions.reduce((sum, pos) => sum + pos._x, 0) / eyePositions.length;
+      const y = eyePositions.reduce((sum, pos) => sum + pos._y, 0) / eyePositions.length;
+  
+      overlayContext.beginPath();
+      overlayContext.arc(x, y, 5, 0, 2 * Math.PI);
+      overlayContext.fillStyle = "red";
+      overlayContext.fill();
+      overlayContext.closePath();
+    });
+  }
+  
 
 // Start webcam and process frames
 async function startVideo() {
@@ -80,7 +82,7 @@ async function startVideo() {
           faceCountElement.textContent = resizedResults.length;
           resizedResults.forEach((detection) => {
             const mappedLandmarks = mapLandmarkCoordinates(detection.landmarks.positions);
-            drawEyePosition(mappedLandmarks);
+            drawEyePosition(video, mappedLandmarks);
           });
 
           await new Promise((resolve) =>

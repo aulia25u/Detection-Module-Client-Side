@@ -24,10 +24,10 @@
             width: 100%;
         }
 
-        video, canvas {
-            position: absolute;
+        .video-container, .overlay-container {
+            display: inline-block;
         }
-
+        
         th, td {
             border: 1px solid black;
             padding: 8px;
@@ -45,13 +45,15 @@
 
 <body>
     <header class="bg-success text-white text-center py-4">
-        <h1>Face Detection Demo</h1>
+        <h1>Eye Detection Demo</h1>
     </header>
-    <div>
+    <div class="video-container">
         <video id="video" width="720" height="560" autoplay muted></video>
+      </div>
+      <div class="overlay-container">
         <canvas id="overlay" width="720" height="560"></canvas>
-      </div>      
-    <div>
+      </div>
+      
         <h3>Face Count: <span id="face-count"></span></h3>
     </div>
     <div>
