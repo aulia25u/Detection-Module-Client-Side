@@ -15,51 +15,36 @@
             margin-bottom: 1rem;
         }
 
-        #video {
-            margin-bottom: 1rem;
-        }
-
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        .video-container, .overlay-container {
+        .video-container,
+        .overlay-container {
             display: inline-block;
         }
-        
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
-        }
 
-        th {
-            background-color: #f2f2f2;
+        #video {
+            margin-right: 1rem;
         }
     </style>
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh"></script>
-    <script defer src="app-eyedetect.js"></script>
 </head>
 
 <body>
     <header class="bg-success text-white text-center py-4">
-        <h1>Eye Detection Demo</h1>
+        <h1>Face Detection Demo</h1>
     </header>
     <div class="video-container">
         <video id="video" width="720" height="560" autoplay muted></video>
-      </div>
-      <div class="overlay-container">
+    </div>
+    <div class="overlay-container">
         <canvas id="overlay" width="720" height="560"></canvas>
-      </div>
-      
+    </div>
+    <div>
         <h3>Face Count: <span id="face-count"></span></h3>
     </div>
     <div>
-        <h3>Landmarks:</h3>
+        <h3>Eye Positions:</h3>
         <p id="face-landmarks"></p>
     </div>
+    <script src="app-eyedetect.js"></script>
 </body>
 
 </html>
