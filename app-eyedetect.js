@@ -8,12 +8,12 @@ async function loadModels() {
     const modelPath = "https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights";
     await faceapi.nets.ssdMobilenetv1.loadFromUri(modelPath);
     await faceapi.nets.faceLandmark68Net.loadFromUri(modelPath);
-    await faceapi.nets.faceExpressionNet.loadFromUri(modelPath);
+    // Only load the models you need. If you aren't using face expressions, you can remove this line.
+    // await faceapi.nets.faceExpressionNet.loadFromUri(modelPath);
 }
 
 function drawEyePosition(video, mappedLandmarks) {
     overlayContext.drawImage(video, 0, 0, overlayCanvas.width, overlayCanvas.height);
-
     ["leftEye", "rightEye"].forEach((eye) => {
         const eyePositions = mappedLandmarks[eye];
         overlayContext.beginPath();
@@ -29,6 +29,7 @@ function drawEyePosition(video, mappedLandmarks) {
         overlayContext.stroke();
     });
 }
+
 
 function displayEyePositions(mappedLandmarks) {
     const eyeCoordinates = {
@@ -49,6 +50,28 @@ function displayEyePositions(mappedLandmarks) {
     `;
 }
 
+async function detectFaces() {
+    const detections = await faceapi.detectAllFaces(video).withFaceLandmarks();
+    const resizedResults = faceapi.resizeResults(detections, {
+        width: video.width,
+        height: video.height
+    });
+
+    faceCountElement.textContent = resizedResults.length;
+
+    resizedResults.forEach((detection) => {
+        const mappedLandmarks = {
+            leftEye: detection.landmarks.getLeftEye(),
+            rightEye: detection.landmarks.getRightEye()
+        };
+
+        drawEyePosition(video, mappedLandmarks);
+        displayEyePositions(mappedLandmarks);
+    });
+
+    requestAnimationFrame(detectFaces);
+}
+
 async function startVideo() {
     await loadModels();
 
@@ -56,31 +79,10 @@ async function startVideo() {
         .getUserMedia({ video: true, audio: false })
         .then((stream) => {
             video.srcObject = stream;
-            video.addEventListener("play", async () => {
-                while (video.readyState === 4) {
-                    const detections = await faceapi
-                        .detectAllFaces(video)
-                        .withFaceLandmarks();
-
-                    const resizedResults = faceapi.resizeResults(detections, {
-                        width: video.width,
-                        height: video.height
-                    });
-
-                    faceCountElement.textContent = resizedResults.length;
-                    resizedResults.forEach((detection) => {
-                        const mappedLandmarks = {
-                            leftEye: detection.landmarks.getLeftEye(),
-                            rightEye: detection.landmarks.getRightEye()
-                        };
-
-                        drawEyePosition(video, mappedLandmarks);
-                        displayEyePositions(mappedLandmarks);
-                    });
-
-                    await new Promise((resolve) => setTimeout(resolve, 100));
-                }
-            });
+            video.onloadedmetadata = function() {
+                video.play();
+                detectFaces(); // Start detecting once video is played
+            };
         });
 }
 
