@@ -1,14 +1,70 @@
 const video = document.getElementById("video");
 const overlayCanvas = document.getElementById("overlay");
 const overlayContext = overlayCanvas.getContext("2d");
-const faceCountElement = document.getElementById("face-count");
+const eyeHistoryCanvas = document.getElementById("eyeHistory");
+const eyeHistoryContext = eyeHistoryCanvas.getContext("2d");
 const faceLandmarksElement = document.getElementById("face-landmarks");
+
+const eyeHistory = {
+  leftEye: [],
+  rightEye: [],
+};
 
 async function loadModels() {
   const modelPath =
     "https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights";
   await faceapi.nets.ssdMobilenetv1.loadFromUri(modelPath);
   await faceapi.nets.faceLandmark68Net.loadFromUri(modelPath);
+}
+
+function drawEyeHistory() {
+  eyeHistoryContext.clearRect(
+    0,
+    0,
+    eyeHistoryCanvas.width,
+    eyeHistoryCanvas.height
+  );
+
+  // Draw the circle
+  eyeHistoryContext.beginPath();
+  eyeHistoryContext.arc(100, 100, 100, 0, 2 * Math.PI);
+  eyeHistoryContext.stroke();
+
+  // Draw cross in the middle
+  eyeHistoryContext.beginPath();
+  eyeHistoryContext.moveTo(100, 0);
+  eyeHistoryContext.lineTo(100, 200);
+  eyeHistoryContext.moveTo(0, 100);
+  eyeHistoryContext.lineTo(200, 100);
+  eyeHistoryContext.stroke();
+
+  ["leftEye", "rightEye"].forEach((eye, idx) => {
+    const color = idx === 0 ? "red" : "blue";
+
+    if (eyeHistory[eye].length > 0) {
+      // Draw history line
+      eyeHistoryContext.beginPath();
+      eyeHistoryContext.moveTo(eyeHistory[eye][0].x, eyeHistory[eye][0].y);
+      eyeHistory[eye].forEach((pos) => {
+        eyeHistoryContext.lineTo(pos.x, pos.y);
+      });
+      eyeHistoryContext.strokeStyle = color;
+      eyeHistoryContext.stroke();
+
+      // Draw current position
+      const currentPosition = eyeHistory[eye][eyeHistory[eye].length - 1];
+      eyeHistoryContext.beginPath();
+      eyeHistoryContext.arc(
+        currentPosition.x,
+        currentPosition.y,
+        3,
+        0,
+        2 * Math.PI
+      );
+      eyeHistoryContext.fillStyle = color;
+      eyeHistoryContext.fill();
+    }
+  });
 }
 
 function drawEyePosition(video, mappedLandmarks) {
@@ -33,17 +89,20 @@ function drawEyePosition(video, mappedLandmarks) {
     overlayContext.closePath();
     overlayContext.strokeStyle = "red";
     overlayContext.stroke();
-
-    // Calculate and draw the center of the eye (approximate pupil position)
-    const centerX =
-      eyePositions.reduce((sum, pos) => sum + pos._x, 0) / eyePositions.length;
-    const centerY =
-      eyePositions.reduce((sum, pos) => sum + pos._y, 0) / eyePositions.length;
-    overlayContext.beginPath();
-    overlayContext.arc(centerX, centerY, 2, 0, 2 * Math.PI);
-    overlayContext.fillStyle = "blue";
-    overlayContext.fill();
   });
+
+  // Update eye history and draw on the eyeHistoryCanvas
+  ["leftEye", "rightEye"].forEach((eye) => {
+    const positions = mappedLandmarks[eye];
+    const x =
+      positions.reduce((sum, pos) => sum + pos._x, 0) / positions.length - 100;
+    const y =
+      positions.reduce((sum, pos) => sum + pos._y, 0) / positions.length - 100;
+    eyeHistory[eye].push({ x, y });
+    if (eyeHistory[eye].length > 50) eyeHistory[eye].shift(); // Keep the last 50 positions
+  });
+
+  drawEyeHistory();
 }
 
 function displayEyePositions(mappedLandmarks) {
@@ -62,10 +121,10 @@ function displayEyePositions(mappedLandmarks) {
   });
 
   faceLandmarksElement.innerHTML = `
-        Left Eye (Pupil): X: ${eyeCoordinates.leftEye.x.toFixed(
+        Left Eye: X: ${eyeCoordinates.leftEye.x.toFixed(
           2
         )}, Y: ${eyeCoordinates.leftEye.y.toFixed(2)}<br>
-        Right Eye (Pupil): X: ${eyeCoordinates.rightEye.x.toFixed(
+        Right Eye: X: ${eyeCoordinates.rightEye.x.toFixed(
           2
         )}, Y: ${eyeCoordinates.rightEye.y.toFixed(2)}
     `;
@@ -78,7 +137,7 @@ async function detectFaces() {
     height: video.height,
   });
 
-  faceCountElement.textContent = resizedResults.length;
+  faceLandmarksElement.textContent = resizedResults.length;
 
   resizedResults.forEach((detection) => {
     const mappedLandmarks = {
