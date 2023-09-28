@@ -45,7 +45,7 @@ function drawEyePosition(video, mappedLandmarks) {
     const centerY =
       eyePositions.reduce((sum, pos) => sum + pos._y, 0) / eyePositions.length;
     overlayContext.beginPath();
-    overlayContext.arc(centerX, centerY, 2, 0, 2 * Math.PI);
+    overlayContext.arc(centerX, centerY, 2 * 1.2, 0, 2 * Math.PI); // Increase the radius by 20%
     overlayContext.fillStyle = "blue";
     overlayContext.fill();
   });
@@ -113,7 +113,7 @@ function drawPupilHistory() {
   ["leftEye", "rightEye"].forEach((eye) => {
     eyeHistory[eye].forEach((pos, index) => {
       pupilHistoryContext.beginPath();
-      pupilHistoryContext.arc(pos.x, pos.y, 2, 0, 2 * Math.PI);
+      pupilHistoryContext.arc(pos.x, pos.y, 2 * 1.2, 0, 2 * Math.PI);
       pupilHistoryContext.fillStyle = "red";
       pupilHistoryContext.fill();
       if (index > 0) {
