@@ -15,11 +15,6 @@
             margin-bottom: 1rem;
         }
 
-        .container {
-            display: flex;
-            justify-content: space-around;
-        }
-
         .overlay-container,
         .eyeHistory {
             width: 480px;
@@ -45,17 +40,17 @@
     <header class="bg-success text-white text-center py-4">
         <h1>Eye Detection</h1>
     </header>
-    <div class="container">
-        <div class="video-container" style="visibility: hidden;">
-            <video id="video" width="480" height="373" autoplay muted></video>
-        </div>
-        <div class="overlay-container">
-            <canvas id="overlay" width="480" height="373"></canvas>
-        </div>
-        <div class="eyeHistory">
-            <canvas id="pupil-history" width="480" height="373"></canvas>
-        </div>
+
+    <div class="video-container" style="visibility: hidden;">
+        <video id="video" width="480" height="373" autoplay muted></video>
     </div>
+    <div class="overlay-container">
+        <canvas id="overlay" width="480" height="373"></canvas>
+    </div>
+    <div class="eyeHistory">
+        <canvas id="pupil-history" width="480" height="373"></canvas>
+    </div>
+
     <div>
         <h3>Eye Positions:</h3>
         <p id="face-landmarks"></p>
