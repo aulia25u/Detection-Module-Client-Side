@@ -15,20 +15,13 @@
             margin-bottom: 1rem;
         }
 
-        .overlay-container,
-        .eyeHistory {
-            width: 480px;
-            height: 373px;
+        .video-container,
+        .overlay-container {
+            display: inline-block;
         }
 
-        .video-container {
-            visibility: hidden;
-        }
-
-        video,
-        canvas {
-            width: 100%;
-            height: 100%;
+        #video {
+            margin-right: 1rem;
         }
     </style>
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
@@ -40,8 +33,7 @@
     <header class="bg-success text-white text-center py-4">
         <h1>Eye Detection</h1>
     </header>
-
-    <div class="video-container" style="visibility: hidden;">
+    <div class="video-container">
         <video id="video" width="480" height="373" autoplay muted></video>
     </div>
     <div class="overlay-container">
@@ -50,7 +42,6 @@
     <div class="eyeHistory">
         <canvas id="pupil-history" width="480" height="373"></canvas>
     </div>
-
     <div>
         <h3>Eye Positions:</h3>
         <p id="face-landmarks"></p>
