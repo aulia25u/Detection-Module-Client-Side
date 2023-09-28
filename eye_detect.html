@@ -20,12 +20,14 @@
             justify-content: space-around;
         }
 
-        .video-container,
         .overlay-container,
         .eyeHistory {
             width: 480px;
             height: 373px;
-            /* Proporsi aspek yang disesuaikan */
+        }
+
+        .video-container {
+            visibility: hidden;
         }
 
         video,
@@ -44,7 +46,7 @@
         <h1>Eye Detection</h1>
     </header>
     <div class="container">
-        <div class="video-container">
+        <div class="video-container" style="visibility: hidden;">
             <video id="video" width="480" height="373" autoplay muted></video>
         </div>
         <div class="overlay-container">
