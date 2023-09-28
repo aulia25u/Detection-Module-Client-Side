@@ -89,6 +89,16 @@ function drawEyePosition(video, mappedLandmarks) {
     overlayContext.closePath();
     overlayContext.strokeStyle = "red";
     overlayContext.stroke();
+
+    // Calculate and draw the center of the eye (approximate pupil position)
+    const centerX =
+      eyePositions.reduce((sum, pos) => sum + pos._x, 0) / eyePositions.length;
+    const centerY =
+      eyePositions.reduce((sum, pos) => sum + pos._y, 0) / eyePositions.length;
+    overlayContext.beginPath();
+    overlayContext.arc(centerX, centerY, 2, 0, 2 * Math.PI);
+    overlayContext.fillStyle = "blue";
+    overlayContext.fill();
   });
 
   // Update eye history and draw on the eyeHistoryCanvas
@@ -121,10 +131,10 @@ function displayEyePositions(mappedLandmarks) {
   });
 
   faceLandmarksElement.innerHTML = `
-        Left Eye: X: ${eyeCoordinates.leftEye.x.toFixed(
+        Left Eye (Pupil): X: ${eyeCoordinates.leftEye.x.toFixed(
           2
         )}, Y: ${eyeCoordinates.leftEye.y.toFixed(2)}<br>
-        Right Eye: X: ${eyeCoordinates.rightEye.x.toFixed(
+        Right Eye (Pupil): X: ${eyeCoordinates.rightEye.x.toFixed(
           2
         )}, Y: ${eyeCoordinates.rightEye.y.toFixed(2)}
     `;
