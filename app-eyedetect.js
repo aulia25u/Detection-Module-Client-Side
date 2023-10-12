@@ -57,25 +57,16 @@ function drawEyeOnly(video, eyePositions) {
   const leftEyePositions = eyePositions.leftEye;
   const rightEyePositions = eyePositions.rightEye;
 
-  // Hitung titik tengah dari mata kiri dan mata kanan
-  const leftEyeCenterX =
-    leftEyePositions.reduce((sum, pos) => sum + pos._x, 0) /
-    leftEyePositions.length;
-  const leftEyeCenterY =
-    leftEyePositions.reduce((sum, pos) => sum + pos._y, 0) /
-    leftEyePositions.length;
-  const rightEyeCenterX =
-    rightEyePositions.reduce((sum, pos) => sum + pos._x, 0) /
-    rightEyePositions.length;
-  const rightEyeCenterY =
-    rightEyePositions.reduce((sum, pos) => sum + pos._y, 0) /
-    rightEyePositions.length;
+  // Dapatkan titik-titik ekstrim dari kedua mata
+  const leftEyeXs = leftEyePositions.map((pos) => pos._x);
+  const leftEyeYs = leftEyePositions.map((pos) => pos._y);
+  const rightEyeXs = rightEyePositions.map((pos) => pos._x);
+  const rightEyeYs = rightEyePositions.map((pos) => pos._y);
 
-  // Hitung posisi awal dan akhir dari area mata
-  const startX = Math.min(leftEyeCenterX, rightEyeCenterX) - 20; // Anda bisa mengatur margin ini sesuai kebutuhan
-  const endX = Math.max(leftEyeCenterX, rightEyeCenterX) + 20;
-  const startY = Math.min(leftEyeCenterY, rightEyeCenterY) - 10;
-  const endY = Math.max(leftEyeCenterY, rightEyeCenterY) + 10;
+  const startX = Math.min(...leftEyeXs, ...rightEyeXs) - 10;
+  const endX = Math.max(...leftEyeXs, ...rightEyeXs) + 10;
+  const startY = Math.min(...leftEyeYs, ...rightEyeYs) - 5;
+  const endY = Math.max(...leftEyeYs, ...rightEyeYs) + 5;
 
   // Lakukan cropping dan tampilkan pada canvas "eye_only"
   eyeOnlyContext.drawImage(
