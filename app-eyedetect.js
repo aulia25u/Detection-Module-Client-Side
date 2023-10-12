@@ -4,6 +4,8 @@ const overlayContext = overlayCanvas.getContext("2d");
 const faceLandmarksElement = document.getElementById("face-landmarks");
 const pupilHistoryCanvas = document.getElementById("pupil-history");
 const pupilHistoryContext = pupilHistoryCanvas.getContext("2d");
+const eyeOnlyCanvas = document.getElementById("eye_only");
+const eyeOnlyContext = eyeOnlyCanvas.getContext("2d");
 
 const eyeHistory = {
   leftEye: [],
@@ -49,6 +51,44 @@ function drawEyePosition(video, mappedLandmarks) {
     overlayContext.fillStyle = "blue";
     overlayContext.fill();
   });
+}
+
+function drawEyeOnly(video, eyePositions) {
+  const leftEyePositions = eyePositions.leftEye;
+  const rightEyePositions = eyePositions.rightEye;
+
+  // Hitung titik tengah dari mata kiri dan mata kanan
+  const leftEyeCenterX =
+    leftEyePositions.reduce((sum, pos) => sum + pos._x, 0) /
+    leftEyePositions.length;
+  const leftEyeCenterY =
+    leftEyePositions.reduce((sum, pos) => sum + pos._y, 0) /
+    leftEyePositions.length;
+  const rightEyeCenterX =
+    rightEyePositions.reduce((sum, pos) => sum + pos._x, 0) /
+    rightEyePositions.length;
+  const rightEyeCenterY =
+    rightEyePositions.reduce((sum, pos) => sum + pos._y, 0) /
+    rightEyePositions.length;
+
+  // Hitung posisi awal dan akhir dari area mata
+  const startX = Math.min(leftEyeCenterX, rightEyeCenterX) - 20; // Anda bisa mengatur margin ini sesuai kebutuhan
+  const endX = Math.max(leftEyeCenterX, rightEyeCenterX) + 20;
+  const startY = Math.min(leftEyeCenterY, rightEyeCenterY) - 10;
+  const endY = Math.max(leftEyeCenterY, rightEyeCenterY) + 10;
+
+  // Lakukan cropping dan tampilkan pada canvas "eye_only"
+  eyeOnlyContext.drawImage(
+    video,
+    startX,
+    startY,
+    endX - startX,
+    endY - startY,
+    0,
+    0,
+    eyeOnlyCanvas.width,
+    eyeOnlyCanvas.height
+  );
 }
 
 function displayEyePositions(mappedLandmarks) {
@@ -145,6 +185,7 @@ async function detectFaces() {
 
     drawEyePosition(video, mappedLandmarks);
     displayEyePositions(mappedLandmarks);
+    drawEyeOnly(video, mappedLandmarks);
 
     ["leftEye", "rightEye"].forEach((eye) => {
       const positions = mappedLandmarks[eye];
