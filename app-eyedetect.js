@@ -58,15 +58,17 @@ function drawEyeOnly(video, eyePositions) {
   const rightEyePositions = eyePositions.rightEye;
 
   // Dapatkan titik-titik ekstrim dari kedua mata
-  const leftEyeXs = leftEyePositions.map((pos) => pos._x);
-  const leftEyeYs = leftEyePositions.map((pos) => pos._y);
-  const rightEyeXs = rightEyePositions.map((pos) => pos._x);
-  const rightEyeYs = rightEyePositions.map((pos) => pos._y);
+  const allEyeXs = [...leftEyePositions, ...rightEyePositions].map(
+    (pos) => pos._x
+  );
+  const allEyeYs = [...leftEyePositions, ...rightEyePositions].map(
+    (pos) => pos._y
+  );
 
-  const startX = Math.min(...leftEyeXs, ...rightEyeXs) - 10;
-  const endX = Math.max(...leftEyeXs, ...rightEyeXs) + 10;
-  const startY = Math.min(...leftEyeYs, ...rightEyeYs) - 5;
-  const endY = Math.max(...leftEyeYs, ...rightEyeYs) + 5;
+  const startX = Math.min(...allEyeXs) - 10; // Tambahkan margin jika diperlukan
+  const endX = Math.max(...allEyeXs) + 10;
+  const startY = Math.min(...allEyeYs) - 10;
+  const endY = Math.max(...allEyeYs) + 10;
 
   // Lakukan cropping dan tampilkan pada canvas "eye_only"
   eyeOnlyContext.drawImage(
