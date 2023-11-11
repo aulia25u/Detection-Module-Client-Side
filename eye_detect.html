@@ -18,7 +18,7 @@
         .video-container,
         .overlay-container,
         .eyeHistory,
-        .eye_only {
+        .face_only {
             display: inline-block;
         }
 
@@ -44,14 +44,15 @@
     <div class="eyeHistory">
         <canvas id="pupil-history" width="480" height="373"></canvas>
     </div>
-    <div class="eye_only">
-        <canvas id="eye_only" width="100" height="50"></canvas>
-    </div>
+    <!-- <div class="face_only">
+        <canvas id="face_only" width="480" height="373"></canvas>
+    </div> -->
     <div>
         <h3>Pupil Tracking :</h3>
         <p id="face-landmarks"></p>
     </div>
-
+    <div><button onclick="downloadTrackingData()">Download Tracking Data</button>
+    </div>
 </body>
 
 </html>

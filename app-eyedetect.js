@@ -4,19 +4,96 @@ const overlayContext = overlayCanvas.getContext("2d");
 const faceLandmarksElement = document.getElementById("face-landmarks");
 const pupilHistoryCanvas = document.getElementById("pupil-history");
 const pupilHistoryContext = pupilHistoryCanvas.getContext("2d");
-const eyeOnlyCanvas = document.getElementById("eye_only");
-const eyeOnlyContext = eyeOnlyCanvas.getContext("2d");
 
 const eyeHistory = {
   leftEye: [],
   rightEye: [],
 };
 
+function getBrowserInfo() {
+  return {
+    userAgent: navigator.userAgent,
+    platform: navigator.platform,
+    language: navigator.language,
+  };
+}
+
+function getWebcamInfo() {
+  if (video && video.srcObject) {
+    const tracks = video.srcObject.getTracks();
+    return tracks.map((track) => ({
+      label: track.label,
+      settings: track.getSettings(),
+    }));
+  }
+  return [];
+}
+
 async function loadModels() {
   const modelPath =
     "https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights";
   await faceapi.nets.ssdMobilenetv1.loadFromUri(modelPath);
   await faceapi.nets.faceLandmark68Net.loadFromUri(modelPath);
+}
+
+let trackingData = [];
+
+function addTrackingData(leftEye, rightEye) {
+  const currentTime = new Date().toISOString();
+  trackingData.push({
+    time: currentTime,
+    leftEye: leftEye,
+    rightEye: rightEye,
+  });
+}
+
+let lastSaveTime = Date.now();
+
+function shouldSaveData(currentCoordinates, lastCoordinates) {
+  const movementThreshold = 5; // pixels
+  const timeThreshold = 1000; // milliseconds
+  const currentTime = Date.now();
+
+  if (currentTime - lastSaveTime > timeThreshold) {
+    // Check if lastCoordinates is defined
+    if (lastCoordinates) {
+      const distance = Math.sqrt(
+        Math.pow(currentCoordinates.x - lastCoordinates.x, 2) +
+          Math.pow(currentCoordinates.y - lastCoordinates.y, 2)
+      );
+
+      if (distance > movementThreshold) {
+        lastSaveTime = currentTime;
+        return true;
+      }
+    } else {
+      // If lastCoordinates is not defined, allow saving the data
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function saveTrackingData() {
+  // Retrieve existing data from local storage
+  const existingDataJSON = localStorage.getItem("trackingData");
+  const existingData = existingDataJSON
+    ? JSON.parse(existingDataJSON)
+    : {
+        browserInfo: getBrowserInfo(),
+        webcamInfo: getWebcamInfo(),
+        trackingData: [],
+      };
+
+  // Append new tracking data to existing data
+  existingData.trackingData.push(...trackingData);
+
+  // Save the updated data back to local storage
+  localStorage.setItem("trackingData", JSON.stringify(existingData));
+
+  // Optionally, you can clear the trackingData array here if you don't want it to grow indefinitely
+  // trackingData = [];
 }
 
 function drawEyePosition(video, mappedLandmarks) {
@@ -53,35 +130,20 @@ function drawEyePosition(video, mappedLandmarks) {
   });
 }
 
-function drawEyeOnly(video, eyePositions) {
-  const leftEyePositions = eyePositions.leftEye;
-  const rightEyePositions = eyePositions.rightEye;
-
-  // Dapatkan titik-titik ekstrim dari kedua mata
-  const allEyeXs = [...leftEyePositions, ...rightEyePositions].map(
-    (pos) => pos._x
-  );
-  const allEyeYs = [...leftEyePositions, ...rightEyePositions].map(
-    (pos) => pos._y
-  );
-
-  const startX = Math.min(...allEyeXs) - 10; // Tambahkan margin jika diperlukan
-  const endX = Math.max(...allEyeXs) + 10;
-  const startY = Math.min(...allEyeYs) - 10;
-  const endY = Math.max(...allEyeYs) + 10;
-
-  // Lakukan cropping dan tampilkan pada canvas "eye_only"
-  eyeOnlyContext.drawImage(
-    video,
-    startX,
-    startY,
-    endX - startX,
-    endY - startY,
-    0,
-    0,
-    eyeOnlyCanvas.width,
-    eyeOnlyCanvas.height
-  );
+function drawFaceBoundaries(detection) {
+  const landmarks = detection.landmarks.positions;
+  if (landmarks.length > 0) {
+    overlayContext.beginPath();
+    overlayContext.moveTo(landmarks[0]._x, landmarks[0]._y);
+    landmarks.forEach((landmark, index) => {
+      if (index > 0) {
+        overlayContext.lineTo(landmark._x, landmark._y);
+      }
+    });
+    overlayContext.closePath();
+    overlayContext.strokeStyle = "green"; // Color for face boundary
+    overlayContext.stroke();
+  }
 }
 
 function displayEyePositions(mappedLandmarks) {
@@ -107,6 +169,14 @@ function displayEyePositions(mappedLandmarks) {
       2
     )}, Y: ${eyeCoordinates.rightEye.y.toFixed(2)}
   `;
+
+  const shouldSave =
+    shouldSaveData(eyeCoordinates.leftEye, eyeHistory.leftEye.slice(-1)[0]) ||
+    shouldSaveData(eyeCoordinates.rightEye, eyeHistory.rightEye.slice(-1)[0]);
+
+  if (shouldSave) {
+    addTrackingData(eyeCoordinates.leftEye, eyeCoordinates.rightEye);
+  }
 }
 
 function drawPupilHistory() {
@@ -170,6 +240,8 @@ async function detectFaces() {
     height: video.height,
   });
 
+  overlayContext.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+
   resizedResults.forEach((detection) => {
     const mappedLandmarks = {
       leftEye: detection.landmarks.getLeftEye(),
@@ -178,7 +250,9 @@ async function detectFaces() {
 
     drawEyePosition(video, mappedLandmarks);
     displayEyePositions(mappedLandmarks);
-    drawEyeOnly(video, mappedLandmarks);
+
+    // Draw face boundaries
+    drawFaceBoundaries(detection);
 
     ["leftEye", "rightEye"].forEach((eye) => {
       const positions = mappedLandmarks[eye];
@@ -196,6 +270,19 @@ async function detectFaces() {
   requestAnimationFrame(detectFaces);
 }
 
+function downloadTrackingData() {
+  const data = localStorage.getItem("trackingData");
+  const blob = new Blob([data], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "pupil-tracking-data.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
 async function startVideo() {
   await loadModels();
 
@@ -211,3 +298,6 @@ async function startVideo() {
 }
 
 startVideo();
+
+// Save data every second (1000 milliseconds)
+setInterval(saveTrackingData, 1000);
