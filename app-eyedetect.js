@@ -11,6 +11,25 @@ const eyeHistory = {
   rightEye: [],
 };
 
+let pupilData = {
+  browserInfo: {
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      language: navigator.language
+  },
+  webcamInfo: [],
+  trackingData: []
+};
+
+async function getWebcamSettings(stream) {
+  const videoTrack = stream.getVideoTracks()[0];
+  const settings = videoTrack.getSettings();
+  return {
+      label: videoTrack.label,
+      settings: settings
+  };
+}
+
 // Additional code for gathering browser and webcam info
 function getBrowserInfo() {
   return {
@@ -19,24 +38,19 @@ function getBrowserInfo() {
   };
 }
 
-let webcamInfo = {};
-
 // Modified startVideo function to get webcam info
 async function startVideo() {
   await loadModels();
   await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-      .then((stream) => {
-          video.srcObject = stream;
-          webcamInfo = { label: stream.getVideoTracks()[0].label }; // Gets webcam label
-          video.onloadedmetadata = function() {
-              video.play();
-              detectFaces();
-          };
-      });
+    .then(async (stream) => {
+      video.srcObject = stream;
+      pupilData.webcamInfo.push(await getWebcamSettings(stream));
+      video.onloadedmetadata = function () {
+        video.play();
+        detectFaces();
+      };
+    });
 }
-
-// Array to store pupil tracking data
-let pupilData = [];
 
 async function loadModels() {
   const modelPath =
@@ -176,26 +190,24 @@ async function detectFaces() {
 
     ["leftEye", "rightEye"].forEach((eye) => {
       const positions = mappedLandmarks[eye];
-      const x =
-        positions.reduce((sum, pos) => sum + pos._x, 0) / positions.length;
-      const y =
-        positions.reduce((sum, pos) => sum + pos._y, 0) / positions.length;
+      const x = positions.reduce((sum, pos) => sum + pos._x, 0) / positions.length;
+      const y = positions.reduce((sum, pos) => sum + pos._y, 0) / positions.length;
       eyeHistory[eye].push({ x, y });
       if (eyeHistory[eye].length > 50) eyeHistory[eye].shift();
     });
 
     drawPupilHistory();
 
-    const dataEntry = {
-      browserInfo: getBrowserInfo(),
-      webcamInfo: webcamInfo,
-      dateTime: new Date().toISOString(),
-      pupilTracking: {
-          leftEye: eyeHistory.leftEye.slice(-1)[0], // Get the latest position
-          rightEye: eyeHistory.rightEye.slice(-1)[0]
-      }
-  };
-      pupilData.push(dataEntry);
+    // Adding the tracking data
+    const time = new Date().toISOString();
+    const leftEye = eyeHistory.leftEye.slice(-1)[0];
+    const rightEye = eyeHistory.rightEye.slice(-1)[0];
+
+    pupilData.trackingData.push({
+        time: time,
+        leftEye: { x: leftEye.x, y: leftEye.y },
+        rightEye: { x: rightEye.x, y: rightEye.y }
+    });
   });
 
   requestAnimationFrame(detectFaces);
