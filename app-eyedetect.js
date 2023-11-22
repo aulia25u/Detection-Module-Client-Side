@@ -4,11 +4,39 @@ const overlayContext = overlayCanvas.getContext("2d");
 const faceLandmarksElement = document.getElementById("face-landmarks");
 const pupilHistoryCanvas = document.getElementById("pupil-history");
 const pupilHistoryContext = pupilHistoryCanvas.getContext("2d");
+document.getElementById('downloadButton').addEventListener('click', downloadData);
 
 const eyeHistory = {
   leftEye: [],
   rightEye: [],
 };
+
+// Additional code for gathering browser and webcam info
+function getBrowserInfo() {
+  return {
+      userAgent: navigator.userAgent,
+      // Add other browser properties if needed
+  };
+}
+
+let webcamInfo = {};
+
+// Modified startVideo function to get webcam info
+async function startVideo() {
+  await loadModels();
+  await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+      .then((stream) => {
+          video.srcObject = stream;
+          webcamInfo = { label: stream.getVideoTracks()[0].label }; // Gets webcam label
+          video.onloadedmetadata = function() {
+              video.play();
+              detectFaces();
+          };
+      });
+}
+
+// Array to store pupil tracking data
+let pupilData = [];
 
 async function loadModels() {
   const modelPath =
@@ -157,9 +185,30 @@ async function detectFaces() {
     });
 
     drawPupilHistory();
+
+    const dataEntry = {
+      browserInfo: getBrowserInfo(),
+      webcamInfo: webcamInfo,
+      dateTime: new Date().toISOString(),
+      pupilTracking: {
+          leftEye: eyeHistory.leftEye.slice(-1)[0], // Get the latest position
+          rightEye: eyeHistory.rightEye.slice(-1)[0]
+      }
+  };
+      pupilData.push(dataEntry);
   });
 
   requestAnimationFrame(detectFaces);
+}
+
+function downloadData() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(pupilData));
+  const downloadAnchorNode = document.createElement('a');
+  downloadAnchorNode.setAttribute("href", dataStr);
+  downloadAnchorNode.setAttribute("download", "pupil_tracking_data.json");
+  document.body.appendChild(downloadAnchorNode);
+  downloadAnchorNode.click();
+  downloadAnchorNode.remove();
 }
 
 async function startVideo() {
